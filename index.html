@@ -72,11 +72,11 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <div class="ai-metric text-center">
-                            <div id="precision-live" class="text-lg font-bold">87%</div>
-                            <div class="text-white/80">Precisión</div>
+                            <div id="precision-live" class="text-lg font-bold">0.0%</div>
+                            <div class="text-white/80">Tasa Cotejo</div>
                         </div>
                         <div class="ai-metric text-center">
-                            <div id="relations-live" class="text-lg font-bold">156</div>
+                            <div id="relations-live" class="text-lg font-bold">0</div>
                             <div class="text-white/80">Relaciones</div>
                         </div>
                     </div>
@@ -184,15 +184,12 @@
                         </div>
 
                         <div class="text-center mt-8">
-                            <!-- 🎯 BOTONES DE ANÁLISIS - CON AMBAS OPCIONES -->
                             <div class="flex flex-col sm:flex-row justify-center gap-4">
                                 <button id="analyze-button" class="btn btn-primary text-xl px-10 py-4 focus-visible"
                                     disabled type="button">
                                     <i class="fas fa-cogs mr-3" aria-hidden="true"></i>
                                     Analizar con Make (Original)
                                 </button>
-                                
-                                <!-- 🚀 NUEVO BOTÓN SUPABASE CON TIEMPO REAL -->
                                 <button id="analyze-supabase-button" class="btn text-xl px-10 py-4 focus-visible bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
                                     disabled type="button" title="15x más rápido que Make">
                                     <i class="fas fa-rocket mr-3" aria-hidden="true"></i>
@@ -202,8 +199,6 @@
                                     </span>
                                 </button>
                             </div>
-                            
-                            <!-- INDICADORES DE VELOCIDAD -->
                             <div class="mt-4 text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                                 <div class="flex items-center justify-center space-x-2 p-3 bg-blue-50 rounded-lg">
                                     <i class="fas fa-turtle text-blue-600"></i>
@@ -225,15 +220,12 @@
                                     Iniciando análisis...
                                 </h3>
                             </div>
-
                             <div class="progress-container mb-6">
                                 <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
                             </div>
-
                             <p id="progress-message" class="text-gray-600 mb-8 text-lg">
                                 Tu receta se está procesando. Gracias por tu paciencia.
                             </p>
-
                             <div id="ai-learning-indicators"
                                 class="hidden mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
                                 <h4 class="font-semibold text-purple-800 mb-2 flex items-center">
@@ -255,7 +247,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div id="live-results" class="mt-8 text-left border-t pt-6">
                                 <h4 class="font-semibold text-gray-800 mb-4 text-xl">
                                     <i class="fas fa-utensils mr-2 text-teal-500" aria-hidden="true"></i>
@@ -265,7 +256,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="snap-results-area" class="hidden"></div>
                 </section>
 
@@ -287,10 +277,7 @@
                             Actualizar
                         </button>
                     </div>
-
-                    <div id="ingredientes-ia-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    </div>
-
+                    <div id="ingredientes-ia-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                     <div id="ingredientes-ia-empty-state" class="hidden empty-state card mt-8">
                         <i class="fas fa-robot text-6xl text-gray-300 mb-4" aria-hidden="true"></i>
                         <h3 class="text-2xl font-semibold text-gray-600 mb-3">No hay ingredientes extraídos</h3>
@@ -319,10 +306,7 @@
                             Actualizar
                         </button>
                     </div>
-
-                    <div id="escandallos-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    </div>
-
+                    <div id="escandallos-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
                     <div id="escandallos-empty-state" class="hidden empty-state card mt-8">
                         <i class="fas fa-search-plus text-6xl text-gray-300 mb-4" aria-hidden="true"></i>
                         <h3 class="text-2xl font-semibold text-gray-600 mb-3">No hay escandallos completados</h3>
@@ -344,26 +328,21 @@
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="card p-6 text-center ai-learning-indicator">
-                            <div class="text-3xl font-bold text-purple-600 mb-2" id="dashboard-precision">87.3%</div>
-                            <div class="text-gray-600 font-medium">Precisión Global</div>
-                            <div class="text-xs text-green-600 mt-1" id="precision-trend">+12% esta semana</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="card p-6 text-center">
+                            <div class="text-3xl font-bold text-teal-600 mb-2" id="dashboard-cotejo-rate">0.0%</div>
+                            <div class="text-gray-600 font-medium">Tasa de Cotejo</div>
+                            <div class="text-xs text-gray-500 mt-1">Último análisis</div>
                         </div>
                         <div class="card p-6 text-center">
-                            <div class="text-3xl font-bold text-pink-600 mb-2" id="dashboard-relations">156</div>
+                            <div class="text-3xl font-bold text-pink-600 mb-2" id="dashboard-relations">0</div>
                             <div class="text-gray-600 font-medium">Relaciones Aprendidas</div>
-                            <div class="text-xs text-blue-600 mt-1" id="relations-trend">+23 esta semana</div>
+                            <div class="text-xs text-blue-600 mt-1">+<span id="relations-today">0</span> hoy</div>
                         </div>
                         <div class="card p-6 text-center">
-                            <div class="text-3xl font-bold text-blue-600 mb-2" id="dashboard-feedback">2,847</div>
+                            <div class="text-3xl font-bold text-blue-600 mb-2" id="dashboard-feedback">0</div>
                             <div class="text-gray-600 font-medium">Feedback Procesado</div>
-                            <div class="text-xs text-orange-600 mt-1" id="feedback-trend">+156 hoy</div>
-                        </div>
-                        <div class="card p-6 text-center">
-                            <div class="text-3xl font-bold text-green-600 mb-2" id="dashboard-optimizations">34</div>
-                            <div class="text-gray-600 font-medium">Optimizaciones IA</div>
-                            <div class="text-xs text-purple-600 mt-1" id="optimizations-trend">Última: hace 2h</div>
+                            <div class="text-xs text-orange-600 mt-1">+<span id="feedback-today">0</span> hoy</div>
                         </div>
                     </div>
 
@@ -379,13 +358,8 @@
                                     Actualizar
                                 </button>
                             </div>
-                            <div id="learned-relations-list" class="space-y-3 max-h-96 overflow-y-auto">
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                            </div>
+                            <div id="learned-relations-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
                         </div>
-
                         <div class="card p-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-xl font-bold text-gray-800 flex items-center">
@@ -397,11 +371,7 @@
                                     Actualizar
                                 </button>
                             </div>
-                            <div id="recent-feedback-list" class="space-y-3 max-h-96 overflow-y-auto">
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                                <div class="loading-skeleton h-16 rounded-lg"></div>
-                            </div>
+                            <div id="recent-feedback-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
                         </div>
                     </div>
 
@@ -410,29 +380,7 @@
                             <i class="fas fa-chart-line text-green-600 mr-2"></i>
                             Evolución del Sistema
                         </h3>
-                        <div id="evolution-chart" class="h-64 flex items-center justify-center">
-                            <div class="text-center">
-                                <div class="spinner mx-auto mb-4"></div>
-                                <p class="text-gray-500">Cargando datos de evolución...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 text-center">
-                        <div class="flex flex-col sm:flex-row justify-center gap-4">
-                            <button id="optimize-system-btn" class="btn btn-ai text-lg px-8 py-4">
-                                <i class="fas fa-magic mr-3"></i>
-                                Optimizar Sistema IA
-                            </button>
-                            <button id="regenerate-embeddings-btn" class="btn btn-primary text-lg px-8 py-4">
-                                <i class="fas fa-brain mr-3"></i>
-                                Regenerar Embeddings
-                            </button>
-                            <button id="export-knowledge-btn" class="btn btn-success text-lg px-8 py-4">
-                                <i class="fas fa-download mr-3"></i>
-                                Exportar Conocimiento
-                            </button>
-                        </div>
+                        <div id="evolution-chart" class="h-64 flex items-center justify-center"></div>
                     </div>
                 </section>
 
@@ -481,7 +429,6 @@
                         <div id="database-container" class="p-6">
                         </div>
                     </div>
-
                     <div id="database-empty-state" class="hidden empty-state card mt-8">
                         <i class="fas fa-database text-6xl text-gray-300 mb-4" aria-hidden="true"></i>
                         <h3 class="text-2xl font-semibold text-gray-600 mb-3">No hay datos disponibles</h3>
@@ -492,7 +439,6 @@
                 </section>
             </div>
 
-            <!-- 🎯 MODALES NECESARIOS -->
             <div id="camera-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4">
                 <div class="modal-content w-full max-w-lg relative">
@@ -516,19 +462,15 @@
                 </div>
             </div>
 
-            <!-- 🎯 MODAL DE DETALLES -->
             <div id="details-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4">
                 <div id="details-modal-content" class="modal-content w-full max-w-7xl relative">
-                    <!-- El contenido se inyecta dinámicamente desde JavaScript -->
                 </div>
             </div>
 
-            <!-- 🎯 MODAL DE DASHBOARD IA -->
             <div id="ai-dashboard-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4 ai-dashboard-modal">
                 <div id="ai-dashboard-modal-content" class="modal-content w-full relative">
-                    <!-- El contenido se inyecta dinámicamente desde JavaScript -->
                 </div>
             </div>
         </main>

@@ -273,26 +273,24 @@ class AILearningSystem {
     }
 
     async loadInitialMetrics() {
-        try {
-            const [feedback, relations, precision] = await Promise.all([
-                this.getFeedbackCount(), //
-                this.getRelationsCount(), //
-                this.getCurrentPrecision() //
-            ]);
-
-            appState.aiMetrics = {
-                ...appState.aiMetrics,
-                feedback: feedback || 0, //
-                relations: relations || 0, //
-                precision: precision || 87.3, //
-                lastUpdate: new Date().toISOString() //
-            };
-
-            this.updateUIMetrics(); //
-        } catch (error) {
-            console.error('Error cargando métricas iniciales:', error); //
-        }
+    try {
+        // Cargamos los totales y también el historial de escandallos
+        const [feedbackTotal, relationsTotal] = await Promise.all([
+            this.getFeedbackCount(),
+            this.getRelationsCount()
+        ]);
+        appState.aiMetrics.feedback = feedbackTotal || 0;
+        appState.aiMetrics.relations = relationsTotal || 0;
+        
+        // Esta línea carga automáticamente los datos para la "Tasa de Cotejo"
+        await loadEscandallosGuardados(); 
+        
+        // Actualizamos la interfaz con todos los datos frescos
+        this.updateUIMetrics();
+    } catch (error) {
+        console.error('Error cargando métricas iniciales:', error);
     }
+}
 
     async getFeedbackCount() {
         try {
@@ -366,6 +364,97 @@ class AILearningSystem {
             return 87.3; //
         }
     }
+
+
+    // Pega este bloque de código dentro de tu clase AILearningSystem en main.js
+// Puedes poner las nuevas funciones debajo de getCurrentPrecision, por ejemplo.
+
+    // Reemplaza la función getTodaysCount con esta en main.js
+
+async getTodaysCount(tableName) {
+    const { data, error } = await supabaseClient.rpc('get_todays_count', {
+        p_table_name: tableName
+    });
+
+    if (error) {
+        // La línea 381 a la que hace referencia tu error está dentro de esta función.
+        // Este nuevo código la soluciona.
+        console.error(`Error contando ${tableName} para hoy:`, error);
+        return 0;
+    }
+    return data || 0;
+}
+
+    async getPrecisionStats() {
+        // Usamos una función RPC de Supabase para eficiencia (Paso 3).
+        const { data, error } = await supabaseClient.rpc('get_precision_stats');
+
+        if (error || !data) {
+            console.error('Error obteniendo estadísticas de precisión:', error);
+            return { global: 0, today: 0 };
+        }
+        // Asegurarnos que no devolvemos null
+        return { 
+            global: data.global_precision || 0, 
+            today: data.today_precision || 0 
+        };
+    }
+
+    async loadInitialMetrics() {
+        try {
+            const [feedbackTotal, relationsTotal, relationsToday, feedbackToday, precisionStats] = await Promise.all([
+                this.getFeedbackCount(),
+                this.getRelationsCount(),
+                this.getTodaysCount(APP_CONFIG.TABLES.RELACIONES_APRENDIDAS),
+                this.getTodaysCount(APP_CONFIG.TABLES.FEEDBACK_COTEJAMIENTO),
+                this.getPrecisionStats()
+            ]);
+
+            appState.aiMetrics = {
+                ...appState.aiMetrics,
+                feedback: feedbackTotal || 0,
+                relations: relationsTotal || 0,
+                relationsToday: relationsToday,
+                feedbackToday: feedbackToday,
+                precision: precisionStats.global,
+                precisionToday: precisionStats.today,
+                lastUpdate: new Date().toISOString()
+            };
+
+            this.updateUIMetrics();
+        } catch (error) {
+            console.error('Error cargando métricas iniciales:', error);
+        }
+    }
+
+   updateUIMetrics() {
+    // 1. Tasa de Cotejo (del último análisis guardado)
+    const lastJob = appState.savedEscandallos && appState.savedEscandallos.length > 0 ? appState.savedEscandallos[0] : null;
+    let cotejoRate = 0.0;
+    if (lastJob && lastJob.resultado_final_json?.estadisticas?.tasa_exito_porcentaje) {
+        cotejoRate = lastJob.resultado_final_json.estadisticas.tasa_exito_porcentaje;
+    }
+    const cotejoRateEl = document.getElementById('dashboard-cotejo-rate');
+    if (cotejoRateEl) cotejoRateEl.textContent = `${parseFloat(cotejoRate).toFixed(1)}%`;
+
+    // 2. Relaciones Totales
+    const dashboardRelationsEl = document.getElementById('dashboard-relations');
+    if (dashboardRelationsEl) dashboardRelationsEl.textContent = appState.aiMetrics.relations;
+    
+    // 3. Feedback Total
+    const dashboardFeedbackEl = document.getElementById('dashboard-feedback');
+    if (dashboardFeedbackEl) dashboardFeedbackEl.textContent = appState.aiMetrics.feedback.toLocaleString();
+
+    // Actualizar también la barra lateral para que sea consistente
+    const precisionLive = document.getElementById('precision-live');
+    if (precisionLive) {
+        precisionLive.textContent = `${parseFloat(cotejoRate).toFixed(1)}%`;
+        const label = precisionLive.nextElementSibling;
+        if (label) label.textContent = 'Tasa Cotejo';
+    }
+    const relationsLive = document.getElementById('relations-live');
+    if (relationsLive) relationsLive.textContent = appState.aiMetrics.relations;
+}
 
     setupRealtimeSubscriptions() {
         if (appState.realtimeChannels.feedback) {
@@ -460,31 +549,52 @@ class AILearningSystem {
         }
     }
 
-    updateUIMetrics() {
-        const precisionLive = document.getElementById('precision-live'); //
-        const relationsLive = document.getElementById('relations-live'); //
+    // Asegúrate de que esta función en main.js esté así:
 
-        if (precisionLive) {
-            precisionLive.textContent = `${appState.aiMetrics.precision.toFixed(1)}%`; //
-        }
-        if (relationsLive) {
-            relationsLive.textContent = appState.aiMetrics.relations; //
-        }
+updateUIMetrics() {
+    // --- MÉTRICAS DEL DASHBOARD ---
 
-        const dashboardPrecision = document.getElementById('dashboard-precision'); //
-        const dashboardRelations = document.getElementById('dashboard-relations'); //
-        const dashboardFeedback = document.getElementById('dashboard-feedback'); //
-
-        if (dashboardPrecision) {
-            dashboardPrecision.textContent = `${appState.aiMetrics.precision.toFixed(1)}%`; //
-        }
-        if (dashboardRelations) {
-            dashboardRelations.textContent = appState.aiMetrics.relations; //
-        }
-        if (dashboardFeedback) {
-            dashboardFeedback.textContent = appState.aiMetrics.feedback.toLocaleString(); //
-        }
+    // 1. Tasa de Cotejo (Nueva Métrica)
+    // Buscamos el último trabajo guardado para obtener su tasa de éxito.
+    // Para que funcione, la pestaña "Escandallos Guardados" debe haber sido cargada al menos una vez.
+    if (!appState.savedEscandallos) appState.savedEscandallos = []; // Inicializar si no existe
+    const lastJob = appState.savedEscandallos.length > 0 ? appState.savedEscandallos[0] : null;
+    let cotejoRate = 0.0;
+    if (lastJob && lastJob.resultado_final_json?.estadisticas?.tasa_exito_porcentaje) {
+        cotejoRate = lastJob.resultado_final_json.estadisticas.tasa_exito_porcentaje;
     }
+    const cotejoRateEl = document.getElementById('dashboard-cotejo-rate');
+    if (cotejoRateEl) cotejoRateEl.textContent = `${parseFloat(cotejoRate).toFixed(1)}%`;
+
+
+    // 2. Relaciones Aprendidas
+    const dashboardRelationsEl = document.getElementById('dashboard-relations');
+    if (dashboardRelationsEl) dashboardRelationsEl.textContent = appState.aiMetrics.relations;
+    
+    const relationsTodayEl = document.getElementById('relations-today');
+    if (relationsTodayEl) relationsTodayEl.textContent = appState.aiMetrics.relationsToday;
+    
+
+    // 3. Feedback Procesado
+    const dashboardFeedbackEl = document.getElementById('dashboard-feedback');
+    if (dashboardFeedbackEl) dashboardFeedbackEl.textContent = appState.aiMetrics.feedback.toLocaleString();
+    
+    const feedbackTodayEl = document.getElementById('feedback-today');
+    if (feedbackTodayEl) feedbackTodayEl.textContent = appState.aiMetrics.feedbackToday;
+
+
+    // --- MÉTRICAS DE LA BARRA LATERAL (SIDEBAR) ---
+    const precisionLive = document.getElementById('precision-live');
+    const relationsLive = document.getElementById('relations-live');
+    
+    // La precisión de la barra lateral ahora también mostrará la tasa de cotejo
+    if (precisionLive) {
+        precisionLive.textContent = `${parseFloat(cotejoRate).toFixed(1)}%`;
+    }
+    if (relationsLive) {
+        relationsLive.textContent = appState.aiMetrics.relations;
+    }
+}
 
     async refreshLearningDashboard() {
         await this.loadLearnedRelations(); //
@@ -1618,25 +1728,96 @@ async function loadEscandallosGuardados() {
     }
 }
 
+// Busca esta función en tu main.js y reemplázala por completo
+
+// Reemplaza la función entera en tu main.js por esta versión robusta:
+
 function renderEscandallosGuardados(escandallos) {
-    // ...
+    const grid = document.getElementById('escandallos-grid');
+    const emptyState = document.getElementById('escandallos-empty-state');
+
+    if (!escandallos || escandallos.length === 0) {
+        if (grid) grid.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+    }
+
+    if(emptyState) emptyState.classList.add('hidden');
+    if(!grid) return;
+
     grid.innerHTML = escandallos.map(item => {
         let data, platos;
         try {
-            // Si no hay JSON, o está vacío, no seguimos.
-            if (!item.resultado_final_json) {
-                console.warn(`Escandallo ${item.id} no tiene resultado_final_json`);
-                return ''; // Retorna un string vacío para que no se renderice nada.
+            if (!item.resultado_final_json || typeof item.resultado_final_json !== 'string') {
+                console.warn(`Escandallo ${item.id} no tiene un JSON válido.`);
+                return ''; 
             }
-            data = typeof item.resultado_final_json === 'string' ?
-                JSON.parse(item.resultado_final_json) : item.resultado_final_json;
+            
+            // --- INICIO DE LA CORRECCIÓN ---
+            // Esta nueva lógica busca el primer JSON válido en el texto y ignora el resto.
+            let jsonString = item.resultado_final_json.trim();
+            const firstBrace = jsonString.indexOf('{');
+            const lastBrace = jsonString.lastIndexOf('}');
+
+            if (firstBrace === -1 || lastBrace === -1) {
+                throw new Error("No se encontraron llaves '{' o '}' en el string del JSON.");
+            }
+            
+            // Extraemos lo que parece ser el primer objeto JSON completo.
+            jsonString = jsonString.substring(firstBrace, lastBrace + 1);
+            // --- FIN DE LA CORRECCIÓN ---
+
+            data = JSON.parse(jsonString); // Ahora parseamos el string limpio.
             platos = data?.platos_procesados || [];
+
         } catch (e) {
+            // Este es el error que estás viendo en la consola.
             console.error(`Error parseando JSON para el trabajo ${item.id}:`, e);
-            // Renderiza una tarjeta de error o simplemente no la muestres
-            return `<div class="card p-6 border-red-500">Error en los datos de este escandallo (ID: ${item.id})</div>`;
+            // Mostramos una tarjeta de error para el dato corrupto sin detener la página.
+            return `<div class="card p-6 border-red-500 bg-red-50">
+                        <p class="font-bold text-red-700">Error en los datos</p>
+                        <p class="text-sm text-red-600">No se pudo cargar el escandallo con ID: ${item.id}</p>
+                    </div>`;
         }
-        // ... el resto de tu lógica de renderizado
+
+        // El resto del código para dibujar la tarjeta sigue igual...
+        const totalIngredients = platos.reduce((sum, p) => sum + (p.ingredientes_cotejados?.length || 0), 0);
+        const foundIngredients = platos.reduce((sum, p) => sum + Utils.calculateFoundIngredients(p.ingredientes_cotejados), 0);
+        const successRate = totalIngredients > 0 ? Math.round((foundIngredients / totalIngredients) * 100) : 0;
+        const platoPrincipal = platos[0]?.plato_analizado || item.nombre_original_archivo || 'Análisis';
+
+        return `
+            <div class="card p-6 bg-white hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-xl text-gray-800">${Utils.sanitizeHTML(platoPrincipal)}</h3>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Analizado el ${Utils.formatDate(item.created_at)}
+                        </p>
+                    </div>
+                    <div class="text-right flex-shrink-0 ml-4">
+                        <div class="text-2xl font-bold text-teal-600">${successRate}%</div>
+                        <p class="text-xs text-gray-500">Éxito</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6 text-center">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-xl font-bold text-blue-600">${platos.length}</p>
+                        <p class="text-xs text-gray-600">Platos</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-xl font-bold text-green-600">${totalIngredients}</p>
+                        <p class="text-xs text-gray-600">Ingredientes</p>
+                    </div>
+                </div>
+                
+                <button onclick="showEscandalloDetails('${item.id}')" class="w-full btn btn-primary">
+                    <i class="fas fa-eye mr-2"></i>
+                    Ver Detalles
+                </button>
+            </div>
+        `;
     }).filter(Boolean).join('');
 }
 
