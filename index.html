@@ -184,11 +184,36 @@
                         </div>
 
                         <div class="text-center mt-8">
-                            <button id="analyze-button" class="btn btn-primary text-xl px-10 py-4 focus-visible"
-                                disabled type="button">
-                                <i class="fas fa-cogs mr-3" aria-hidden="true"></i>
-                                Analizar Receta
-                            </button>
+                            <!-- 🎯 BOTONES DE ANÁLISIS - CON AMBAS OPCIONES -->
+                            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                                <button id="analyze-button" class="btn btn-primary text-xl px-10 py-4 focus-visible"
+                                    disabled type="button">
+                                    <i class="fas fa-cogs mr-3" aria-hidden="true"></i>
+                                    Analizar con Make (Original)
+                                </button>
+                                
+                                <!-- 🚀 NUEVO BOTÓN SUPABASE CON TIEMPO REAL -->
+                                <button id="analyze-supabase-button" class="btn text-xl px-10 py-4 focus-visible bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+                                    disabled type="button" title="15x más rápido que Make">
+                                    <i class="fas fa-rocket mr-3" aria-hidden="true"></i>
+                                    <span class="flex flex-col items-center">
+                                        <span>Análisis Rápido Supabase</span>
+                                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold animate-pulse">TIEMPO REAL</span>
+                                    </span>
+                                </button>
+                            </div>
+                            
+                            <!-- INDICADORES DE VELOCIDAD -->
+                            <div class="mt-4 text-sm text-gray-600 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                                <div class="flex items-center justify-center space-x-2 p-3 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-turtle text-blue-600"></i>
+                                    <span>Make: ~3 minutos</span>
+                                </div>
+                                <div class="flex items-center justify-center space-x-2 p-3 bg-green-50 rounded-lg">
+                                    <i class="fas fa-rocket text-green-600"></i>
+                                    <span>Supabase: ~20 segundos</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -467,6 +492,7 @@
                 </section>
             </div>
 
+            <!-- 🎯 MODALES NECESARIOS -->
             <div id="camera-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4">
                 <div class="modal-content w-full max-w-lg relative">
@@ -490,21 +516,23 @@
                 </div>
             </div>
 
+            <!-- 🎯 MODAL DE DETALLES -->
             <div id="details-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4">
                 <div id="details-modal-content" class="modal-content w-full max-w-7xl relative">
+                    <!-- El contenido se inyecta dinámicamente desde JavaScript -->
                 </div>
             </div>
 
+            <!-- 🎯 MODAL DE DASHBOARD IA -->
             <div id="ai-dashboard-modal"
                 class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[1001] p-4 ai-dashboard-modal">
                 <div id="ai-dashboard-modal-content" class="modal-content w-full relative">
+                    <!-- El contenido se inyecta dinámicamente desde JavaScript -->
                 </div>
             </div>
         </main>
     </div>
-
-    
 </body>
 
 </html>
